@@ -112,8 +112,15 @@ And asks for a json if the user can only take the survey once
 ![image](https://user-images.githubusercontent.com/78903921/176696405-736fb7d5-971e-40ff-b535-12a44f84ff03.png)
 3. Copy code from [appScript.gs](https://github.com/SemenovDaniil/QSForms/blob/main/appScript.gs) and paste into Code.gs  
 ![image](https://user-images.githubusercontent.com/78903921/176697344-2a9556be-cefc-4258-8636-571e06c97312.png)
-4. Click "Deploy" and select "New deployment"
+4. Click "Deploy" and select "New deployment"  
 ![image](https://user-images.githubusercontent.com/78903921/176697530-b65440f7-86f7-4341-be13-4e47829566de.png)
+5. Then select type "Web app"
+![image](https://user-images.githubusercontent.com/78903921/176697776-af67f357-435f-44bc-bc97-516adc2ea4ff.png)
+6. Configure web app
+![image](https://user-images.githubusercontent.com/78903921/176698282-f1db4be9-52e5-477a-8d38-cd286eedfcd2.png)
+7. Click "Deploy" and authorize access
+8. **You will see a link. Copy and paste it into the extension. Now everything should work.**  
+![image](https://user-images.githubusercontent.com/78903921/176698859-f89f11ec-d96e-4a95-9e04-b370a42d2e86.png)
 
 
 **You can write your own web service that will receive and return similar data and write it to any source. I will show an example of the implementation of a record in a Google spreadsheet. It's fast and free :)**
