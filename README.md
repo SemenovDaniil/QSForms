@@ -112,9 +112,9 @@ And asks for a json if the user can only take the survey once
 ![image](https://user-images.githubusercontent.com/78903921/176696405-736fb7d5-971e-40ff-b535-12a44f84ff03.png)
 3. Copy code from [appScript.gs](https://github.com/SemenovDaniil/QSForms/blob/main/appScript.gs) and paste into Code.gs  
 ![image](https://user-images.githubusercontent.com/78903921/176697344-2a9556be-cefc-4258-8636-571e06c97312.png)
-4. Click "Deploy" and select "New deployment"  
+4. Click "Deploy" and select "New deployment"    
 ![image](https://user-images.githubusercontent.com/78903921/176697530-b65440f7-86f7-4341-be13-4e47829566de.png)
-5. Then select type "Web app"
+5. Then select type "Web app"   
 ![image](https://user-images.githubusercontent.com/78903921/176697776-af67f357-435f-44bc-bc97-516adc2ea4ff.png)
 6. Configure web app
 ![image](https://user-images.githubusercontent.com/78903921/176698282-f1db4be9-52e5-477a-8d38-cd286eedfcd2.png)
