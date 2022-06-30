@@ -107,3 +107,13 @@ And asks for a json if the user can only take the survey once
 
 **You can write your own web service that will receive and return similar data and write it to any source. I will show an example of the implementation of a record in a Google spreadsheet. It's fast and free :)**
 
+1. Create and open google table
+2. Select Extensions - Apps Script  
+![image](https://user-images.githubusercontent.com/78903921/176696405-736fb7d5-971e-40ff-b535-12a44f84ff03.png)
+3. Copy code from [appScript.gs](https://github.com/SemenovDaniil/QSForms/blob/main/appScript.gs) and paste into Code.gs  
+![image](https://user-images.githubusercontent.com/78903921/176697344-2a9556be-cefc-4258-8636-571e06c97312.png)
+4. Click "Deploy" and select "New deployment"
+![image](https://user-images.githubusercontent.com/78903921/176697530-b65440f7-86f7-4341-be13-4e47829566de.png)
+
+
+**You can write your own web service that will receive and return similar data and write it to any source. I will show an example of the implementation of a record in a Google spreadsheet. It's fast and free :)**
