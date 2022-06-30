@@ -36,6 +36,13 @@ You can add a trigger on a timeout or on a selection change event in the field
 
 Specify the time in seconds after which a pop-up window will appear. It is necessary to specify for each trigger separately. If there are several triggers and some of them work, then the form will be shown after the minimum timeout of the specified
 
+**Form position**
+
+![image](https://user-images.githubusercontent.com/78903921/176690047-1ad55d24-eb50-4102-91d5-e359f6bcec26.png)
+
+
+Specify the size and position of the popup
+
 
 ### Form configuration
 
@@ -83,4 +90,20 @@ If you select by button, then the question will be considered answered when the 
 
 Enter the minimum value and maximum available for the user to enter a rating
 
+### Web service params
+
+![image](https://user-images.githubusercontent.com/78903921/176690183-a4a1b731-54d5-4369-a4da-645d5493c9ce.png)
+
+Enter the web service address
+
+##Example of web service
+Extension send json when the sruvey completed
+
+![image](https://user-images.githubusercontent.com/78903921/176692676-c58a487b-6813-4192-8196-9e6451e45f34.png)
+
+And asks for a json if the user can only take the survey once
+
+![image](https://user-images.githubusercontent.com/78903921/176693222-42cd903a-602c-4cea-8549-6b5ec5e6bbd0.png)
+
+**You can write your own web service that will receive and return similar data and write it to any source. I will show an example of the implementation of a record in a Google spreadsheet. It's fast and free :)**
 
