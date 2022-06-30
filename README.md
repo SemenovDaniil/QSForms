@@ -116,7 +116,7 @@ And asks for a json if the user can only take the survey once
 ![image](https://user-images.githubusercontent.com/78903921/176697530-b65440f7-86f7-4341-be13-4e47829566de.png)
 5. Then select type "Web app"   
 ![image](https://user-images.githubusercontent.com/78903921/176697776-af67f357-435f-44bc-bc97-516adc2ea4ff.png)
-6. Configure web app
+6. Configure web app  
 ![image](https://user-images.githubusercontent.com/78903921/176698282-f1db4be9-52e5-477a-8d38-cd286eedfcd2.png)
 7. Click "Deploy" and authorize access
 8. **You will see a link. Copy and paste it into the extension. Now everything should work.**  
