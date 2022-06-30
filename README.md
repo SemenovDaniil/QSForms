@@ -122,5 +122,3 @@ And asks for a json if the user can only take the survey once
 8. **You will see a link. Copy and paste it into the extension. Now everything should work.**  
 ![image](https://user-images.githubusercontent.com/78903921/176698859-f89f11ec-d96e-4a95-9e04-b370a42d2e86.png)
 
-
-**You can write your own web service that will receive and return similar data and write it to any source. I will show an example of the implementation of a record in a Google spreadsheet. It's fast and free :)**
