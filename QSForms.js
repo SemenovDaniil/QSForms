@@ -10,6 +10,7 @@ function(qlik) {
 	var isOpenNow = true
 	var timer = []
 	var formIdInLocalStorage
+	var isFirstInEditMode = true
 
 	function clearTimeOuts() {
 		for (var i = 0; i < timer.length; i++) {
@@ -227,7 +228,12 @@ function(qlik) {
 								}
 							},
 							label: "Pop-up form position",
-							items: [{
+							items: [
+								{
+									label:"Pop-up form position",
+									component: "text"
+								},
+								{
 									ref: "positionRight",
 									label: "Right (in px)",
 									type: "integer",
@@ -250,6 +256,79 @@ function(qlik) {
 									label: "Width (in px)",
 									type: "integer",
 									defaultValue: 700
+								}
+
+							]
+						},
+						headerForObjectPosition :{
+							show: function(e) {
+								if (e.displayMode == 'popup') {
+									return true
+								} else {
+									return false
+								}
+							},
+							label:"Object position",
+							component: "text"
+						},
+						hideAtAll:{
+							show: function(e) {
+								if (e.displayMode == 'popup') {
+									return true
+								} else {
+									return false
+								}
+							},
+							ref: "isHideAtAll",
+							label: "Hide object?",
+							type: "boolean",
+							component: "switch",
+							defaultValue: false,
+							options: [{
+									value: true,
+									label: "yes"
+								},
+								{
+									value: false,
+									label: "no"
+								}
+							]
+						},
+						objectPosition: {
+							show: function(e) {
+								if (e.displayMode == 'popup' && e.isHideAtAll) {
+									return true
+								} else {
+									return false
+								}
+							},
+							label: "Object position",
+							
+							items: [
+								
+								{
+									ref: "objectPositionRight",
+									label: "Right (in px)",
+									type: "integer",
+									defaultValue: 2
+								},
+								{
+									ref: "objectPositionTop",
+									label: "Top (in px)",
+									type: "integer",
+									defaultValue: 2
+								},
+								{
+									ref: "objectPositionHeight",
+									label: "Height (in px)",
+									type: "integer",
+									defaultValue: 1
+								},
+								{
+									ref: "objectPositionWidth",
+									label: "Width (in px)",
+									type: "integer",
+									defaultValue: 1
 								}
 
 							]
@@ -426,7 +505,6 @@ function(qlik) {
 			exportData: false
 		},
 		mounted: function() {
-			console.log('mount')
 			mustRendered = true
 			isOpenNow = true
 			
@@ -451,7 +529,14 @@ function(qlik) {
 
 		},
 		paint: function($element, layout) {
-			if (mustRendered) {
+			var _$element = $element
+			var currentMode = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent.editmode;
+
+			if(isFirstInEditMode && !currentMode) {
+				mustRendered = true;
+			}
+			if (mustRendered ) {
+				var currentMode = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent.editmode;
 				formIdInLocalStorage = layout.formId
 				localStorage.removeItem(formIdInLocalStorage)
 				$element.html("")
@@ -502,6 +587,9 @@ function(qlik) {
 
 					if (layout.displayMode == 'popup') {
 						$('div[tid="' + tid + '"] article').css('display', 'none')
+						if(layout.isHideAtAll) {
+							$('div[tid="' + tid + '"]').css('width',layout.objectPositionWidth+'px').css('height',layout.objectPositionHeight+'px').css('right',layout.objectPositionRight+'px').css('top',layout.objectPositionTop+'px').css('left','')
+						}
 						var obj = $('div[tid="' + tid + '"] .qv-object-content-container #qsform')
 						$(obj).hide()
 						if (layout.isCanCloseForm) {
@@ -535,15 +623,10 @@ function(qlik) {
 							})
 
 							Promise.all(timeOutsPromises).then(function() {
-								console.log(timeOuts)
 								if (timeOuts.length > 0) {
 									clearTimeOuts()
 									timeout(Math.min.apply(Math, timeOuts))
 								}
-								/*if(flagMountFromAnotherSheet){
-									flagMountFromAnotherSheet = false
-								}*/
-
 							})
 						}
 
@@ -586,12 +669,15 @@ function(qlik) {
 								rePaintOneCard()
 							}
 							timer.push(setTimeout(function() {
-								$(obj).appendTo('body .qvt-sheet-container .qvt-sheet')
-								$(obj).css('left', '').css('top', '').css('right', right + 'px').css('bottom', bottom + 'px').css('position', 'absolute').css('height', height + 'px').css('width', width + 'px').css('z-index', '1022').css('background', 'white')
-									.css('padding', '10px').css('box-shadow', '0 14px 28px rgb(0 0 0 / 25%), 0 10px 10px rgb(0 0 0 / 22%)')
-								$(obj).slideDown(500)
-								if (layout.isAnotherContentBlocked) {
-									$('body .qvt-sheet-container .qvt-sheet').append('<div id="blocked" class="' + currentClass + '"></div>')
+								var parentscope = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent;
+								if(!parentscope.editmode){
+									$(obj).appendTo('body .qvt-sheet-container .qvt-sheet')
+									$(obj).css('left', '').css('top', '').css('right', right + 'px').css('bottom', bottom + 'px').css('position', 'absolute').css('height', height + 'px').css('width', width + 'px').css('z-index', '1022').css('background', 'white')
+										.css('padding', '10px').css('box-shadow', '0 14px 28px rgb(0 0 0 / 25%), 0 10px 10px rgb(0 0 0 / 22%)')
+									$(obj).slideDown(500)
+									if (layout.isAnotherContentBlocked) {
+										$('body .qvt-sheet-container .qvt-sheet').append('<div id="blocked" class="' + currentClass + '"></div>')
+									}
 								}
 							}, timeout * 1000));
 						}
@@ -870,7 +956,7 @@ function(qlik) {
 					function oneCard(currentIndex, _thisForm) {
 						$(_thisForm).html("")
 						$(_thisForm).append('<legend>' + layout.formLabel + '</legend>')
-						if (layout.isCanCloseForm) {
+						if (layout.isCanCloseForm && layout.displayMode == 'popup') {
 							$(_thisForm).prepend('<i class="bi bi-x-square-fill float-end"></i>')
 							$(_thisForm).find('i.bi-x-square-fill').on('click', function() {
 								if (layout.isFormDontShowAgain) {
