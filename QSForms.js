@@ -19,6 +19,12 @@ function(qlik) {
 	}
 	const app = qlik.currApp();
 	const selectionState = app.selectionState();
+	var appName = ''
+	app.getAppLayout().then(applayout => {
+		appName = applayout.layout.qTitle;
+
+	});
+
 
 	var fieldlist = [];
 
@@ -54,6 +60,12 @@ function(qlik) {
 							label: "Form label",
 							type: "string",
 							defaultValue: "Please take the survey"
+						},
+						{
+							ref: "formSuccessfulText",
+							label: "Form successful text",
+							type: "string",
+							defaultValue: "Thank you for taking the survey"
 						},
 						{
 							ref: "isOnceTakeSurvey",
@@ -109,6 +121,13 @@ function(qlik) {
 								}
 							},
 							items: [{
+									ref: "popupHideTime",
+									label: "Time to close after completion (in seconds)",
+									type: "integer",
+									defaultValue: 5
+
+								},
+								{
 									ref: "isAnotherContentBlocked",
 									label: "Block another content?",
 									type: "boolean",
@@ -228,9 +247,8 @@ function(qlik) {
 								}
 							},
 							label: "Pop-up form position",
-							items: [
-								{
-									label:"Pop-up form position",
+							items: [{
+									label: "Pop-up form position",
 									component: "text"
 								},
 								{
@@ -260,7 +278,7 @@ function(qlik) {
 
 							]
 						},
-						headerForObjectPosition :{
+						headerForObjectPosition: {
 							show: function(e) {
 								if (e.displayMode == 'popup') {
 									return true
@@ -268,10 +286,10 @@ function(qlik) {
 									return false
 								}
 							},
-							label:"Object position",
+							label: "Object position",
 							component: "text"
 						},
-						hideAtAll:{
+						hideAtAll: {
 							show: function(e) {
 								if (e.displayMode == 'popup') {
 									return true
@@ -303,32 +321,32 @@ function(qlik) {
 								}
 							},
 							label: "Object position",
-							
+
 							items: [
-								
+
 								{
 									ref: "objectPositionRight",
 									label: "Right (in px)",
 									type: "integer",
-									defaultValue: 2
+									defaultValue: 0
 								},
 								{
 									ref: "objectPositionTop",
 									label: "Top (in px)",
 									type: "integer",
-									defaultValue: 2
+									defaultValue: -50
 								},
 								{
 									ref: "objectPositionHeight",
 									label: "Height (in px)",
 									type: "integer",
-									defaultValue: 1
+									defaultValue: 50
 								},
 								{
 									ref: "objectPositionWidth",
 									label: "Width (in px)",
 									type: "integer",
-									defaultValue: 1
+									defaultValue: 100
 								}
 
 							]
@@ -361,13 +379,35 @@ function(qlik) {
 							allowAdd: true,
 							allowRemove: true,
 							addTranslation: "Add question",
-
 							items: {
+								questionGrade: {
+									type: "string",
+									ref: "labelGrade",
+									label: "Question",
+									expression: "optional",
+									defaultValue: function() {
+										return "Based on your experience of using " + appName + ", how likely are you to recommend it to a friend or colleague?"
+									},
+									show: function(e) {
+										if (e.answer.type == 'grade') {
+											return true
+										} else {
+											return false
+										}
+									}
+								},
 								question: {
 									type: "string",
 									ref: "label",
 									label: "Question",
-									expression: "optional"
+									expression: "optional",
+									show: function(e) {
+										if (e.answer.type == 'grade') {
+											return false
+										} else {
+											return true
+										}
+									}
 								},
 								answerType: {
 									component: "radiobuttons",
@@ -401,13 +441,15 @@ function(qlik) {
 									},
 									items: {
 										min: {
-											type: "string",
+											type: "integer",
+											defaultValue: 1,
 											ref: "grade.min",
 											label: "min",
 											expression: "optional"
 										},
 										max: {
-											type: "string",
+											type: "integer",
+											defaultValue: 10,
 											ref: "grade.max",
 											label: "max",
 											expression: "optional"
@@ -507,7 +549,7 @@ function(qlik) {
 		mounted: function() {
 			mustRendered = true
 			isOpenNow = true
-			
+
 		},
 		updateData: function() {
 			clearTimeOuts()
@@ -529,13 +571,22 @@ function(qlik) {
 
 		},
 		paint: function($element, layout) {
+			const currentClass = $element[0].parentNode.attributes.id.nodeValue
+			const tid = currentClass.replace('_content', '')
 			var _$element = $element
 			var currentMode = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent.editmode;
 
-			if(isFirstInEditMode && !currentMode) {
+			if (isFirstInEditMode && !currentMode) {
 				mustRendered = true;
 			}
-			if (mustRendered ) {
+
+			if (currentMode && layout.displayMode == 'popup') {
+				$('div[tid="' + tid + '"]').css('background-color', 'red')
+			} else {
+				$('div[tid="' + tid + '"]').css('background-color', '')
+			}
+
+			if (mustRendered) {
 				var currentMode = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent.editmode;
 				formIdInLocalStorage = layout.formId
 				localStorage.removeItem(formIdInLocalStorage)
@@ -545,8 +596,7 @@ function(qlik) {
 				var height = layout.positionHeight
 				var width = layout.positionWidth
 				var timeout = layout.timeout * 1000
-				const currentClass = $element[0].parentNode.attributes.id.nodeValue
-				const tid = currentClass.replace('_content', '')
+
 
 				$('div[tid="' + tid + '"] article').css('display', '')
 				$('#qsform.' + currentClass).remove()
@@ -587,8 +637,9 @@ function(qlik) {
 
 					if (layout.displayMode == 'popup') {
 						$('div[tid="' + tid + '"] article').css('display', 'none')
-						if(layout.isHideAtAll) {
-							$('div[tid="' + tid + '"]').css('width',layout.objectPositionWidth+'px').css('height',layout.objectPositionHeight+'px').css('right',layout.objectPositionRight+'px').css('top',layout.objectPositionTop+'px').css('left','')
+
+						if (layout.isHideAtAll) {
+							$('div[tid="' + tid + '"]').css('width', layout.objectPositionWidth + 'px').css('height', layout.objectPositionHeight + 'px').css('right', layout.objectPositionRight + 'px').css('top', layout.objectPositionTop + 'px').css('left', '')
 						}
 						var obj = $('div[tid="' + tid + '"] .qv-object-content-container #qsform')
 						$(obj).hide()
@@ -670,7 +721,7 @@ function(qlik) {
 							}
 							timer.push(setTimeout(function() {
 								var parentscope = angular.element(_$element).scope().$parent.$parent.$parent.$parent.$parent.$parent.$parent;
-								if(!parentscope.editmode){
+								if (!parentscope.editmode) {
 									$(obj).appendTo('body .qvt-sheet-container .qvt-sheet')
 									$(obj).css('left', '').css('top', '').css('right', right + 'px').css('bottom', bottom + 'px').css('position', 'absolute').css('height', height + 'px').css('width', width + 'px').css('z-index', '1022').css('background', 'white')
 										.css('padding', '10px').css('box-shadow', '0 14px 28px rgb(0 0 0 / 25%), 0 10px 10px rgb(0 0 0 / 22%)')
@@ -694,7 +745,15 @@ function(qlik) {
 						var _thisCard = $(_thisForm).find('.' + cardIndex)
 						$(_thisCard).append('<div class="card-body"></div>')
 						var _thisCardBody = $(_thisCard).find('.card-body')
-						$(_thisCardBody).append('<h5 class="card-title">' + question.label + '</h5>')
+
+						if (question.answer.type == 'grade') {
+							var label = question.labelGrade
+						} else {
+							var label = question.label
+						}
+						$(_thisCardBody).append('<h5 class="card-title">' + label + '</h5>')
+
+
 						switch (question.answer.type) {
 							case 'multipleSelect':
 								question.answers.forEach(function(answer, answerIndex) {
@@ -827,7 +886,7 @@ function(qlik) {
 											exportData.answers.push({
 												"questionIndex": index,
 												"questionType": question.answer.type,
-												"question": question.label,
+												"question": question.labelGrade,
 												"answer": parseInt($('.card.question' + index + ' .btn-primary').html())
 											})
 											resolve()
@@ -879,7 +938,7 @@ function(qlik) {
 									exportData.answers.push({
 										"questionIndex": index,
 										"questionType": question.answer.type,
-										"question": question.label,
+										"question": question.labelGrade,
 										"answer": parseInt($('.card.question' + index + ' .btn-primary').html())
 									})
 									resolve()
@@ -1040,10 +1099,12 @@ function(qlik) {
 
 						$.ajax(settings).done(function(response) {
 							localStorage[formIdInLocalStorage] = 1
-							$(_thisForm).html("<h1>Thank you for taking the survey</h1>")
+							$(_thisForm).html("<h1>" + layout.formSuccessfulText + "</h1>")
 							if (layout.displayMode == 'popup') {
-								$(obj).slideUp(500)
-								$('#blocked.' + currentClass).remove()
+								setTimeout(function() {
+									$(obj).slideUp(500)
+									$('#blocked.' + currentClass).remove()
+								}, layout.popupHideTime * 1000)
 							}
 
 
@@ -1054,7 +1115,7 @@ function(qlik) {
 			}
 			if (layout.displayMode == 'popup') {
 				mustRendered = false
-				
+
 			}
 
 
@@ -1062,6 +1123,3 @@ function(qlik) {
 	};
 
 });
-
-
-
